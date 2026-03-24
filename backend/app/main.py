@@ -9,3 +9,6 @@ async def root():
         "status": "ok",
         "service": "Tutoring Center API"
     }
+
+# Create database tables
+Base.metadata.create_all(bind=engine)
