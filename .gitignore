@@ -1,4 +1,6 @@
 .DS_Store
-backend/venv/
 .vscode/
-__pycache__/
+
+backend/app/__pycache__/
+backend/.env
+backend/venv/
