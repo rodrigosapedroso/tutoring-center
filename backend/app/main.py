@@ -1,5 +1,6 @@
 #File to create the app FastAPI, import routes and connect them to the app
 from fastapi import FastAPI
+from app.database import Base, engine
 
 app = FastAPI(title="Tutoring Center")
 
