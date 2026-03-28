@@ -172,8 +172,9 @@ class Attendance(Base):
     contents = Column(Text)
     homework = Column(Text)
     observations = Column(Text)
+
     teacher_signature = Column(String, nullable=False)
-    student_signature = Column(String, nullable=False)
+    student_signature = Column(String, nullable=True)
 
     absence_reason = Column(Text)
     notified_at = Column(DateTime)
