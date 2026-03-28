@@ -1,6 +1,6 @@
 import enum
 from .database import Base
-from sqlalchemy import Column, Integer, String, Float, Date, DateTime, ForeignKey, Enum, Text, LargeBinary, Boolean, Table
+from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, Enum, Text, Boolean, Table
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -11,13 +11,6 @@ student_parents = Table(
     Base.metadata,
     Column("student_id", String, ForeignKey("students.id"), primary_key=True),
     Column("parent_id", String, ForeignKey("parents.id"), primary_key=True),
-)
-
-student_teachers = Table(
-    "student_teachers",
-    Base.metadata,
-    Column("student_id", String, ForeignKey("students.id"), primary_key=True),
-    Column("teacher_id", String, ForeignKey("teachers.id"), primary_key=True),
 )
 
 teacher_disciplines = Table(
@@ -61,10 +54,10 @@ class Student(Base):
     name = Column(String, nullable=False)
     birth = Column(Date, nullable=False)
     nationality = Column(String, nullable=False)
+    contact = Column(String)
 
     # Relationships 
     parents = relationship("Parent", secondary=student_parents, back_populates="students")
-    teachers = relationship("Teacher", secondary=student_teachers, back_populates="students")
     classes = relationship("Class", secondary=class_students, back_populates="students")
 
 
@@ -75,6 +68,7 @@ class Parent(Base):
     user_id = Column(String, ForeignKey("users.id"), unique=True)
     name = Column(String, nullable=False)
     contact = Column(String, nullable=False)
+    address = Column(String, nullable=False)
     email = Column(String, nullable=False)
 
     # Relationships 
@@ -95,13 +89,12 @@ class Teacher(Base):
 
     # Relationships 
     user = relationship("User", back_populates="teacher")
-    students = relationship("Student", secondary=student_teachers, back_populates="teachers")
     classes = relationship("Class", back_populates="teacher")
     disciplines = relationship("Discipline", secondary=teacher_disciplines, back_populates="teachers")
 
 
 # Enum for education levels
-class EducationLevel(enum.Enum):
+class DisciplineLevel(enum.Enum):
     BASIC = "basic"
     SECONDARY = "secondary"
     HIGHER = "higher"
@@ -112,7 +105,7 @@ class Discipline(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    level = Column(Enum(EducationLevel), nullable=False)
+    level = Column(Enum(DisciplineLevel), nullable=False)
 
     # Relationships 
     teachers = relationship("Teacher", secondary=teacher_disciplines, back_populates="disciplines")
@@ -128,10 +121,10 @@ class Class(Base):
     __tablename__ = "classes"
 
     id = Column(String, primary_key=True)
-    teacher_id = Column(String, ForeignKey("teachers.id"))
-    discipline_id = Column(Integer, ForeignKey("disciplines.id"))
-    level = Column(Enum(EducationLevel))
-    type = Column(Enum(ClassType))
+    teacher_id = Column(String, ForeignKey("teachers.id"), nullable=False)
+    discipline_id = Column(Integer, ForeignKey("disciplines.id"), nullable=False)
+    level = Column(Enum(DisciplineLevel), nullable=False)
+    type = Column(Enum(ClassType), nullable=False)
 
     # Relationships 
     teacher = relationship("Teacher", back_populates="classes")
@@ -151,11 +144,11 @@ class ClassSchedule(Base):
     __tablename__ = "class_schedules"
 
     id = Column(Integer, primary_key=True)
-    class_id = Column(String, ForeignKey("classes.id"))
-    weekday = Column(Integer)  # 0-5
-    time = Column(String)
-    duration = Column(Integer)
-    frequency = Column(Enum(ClassFrequencyType))
+    class_id = Column(String, ForeignKey("classes.id"), nullable=False)
+    weekday = Column(Integer, nullable=False)  # 0-5
+    time = Column(String, nullable=False) 
+    duration = Column(Integer, nullable=False) 
+    frequency = Column(Enum(ClassFrequencyType), nullable=False)
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=True)
 
@@ -167,19 +160,20 @@ class Attendance(Base):
     __tablename__ = "attendances"
 
     id = Column(Integer, primary_key=True)
-    class_id = Column(String, ForeignKey("classes.id"))
-    student_id = Column(String, ForeignKey("students.id"))
-    teacher_id = Column(String, ForeignKey("teachers.id"))
+    class_id = Column(String, ForeignKey("classes.id"), nullable=False)
+    student_id = Column(String, ForeignKey("students.id"), nullable=False)
+    teacher_id = Column(String, ForeignKey("teachers.id"), nullable=False)
+    discipline_id = Column(Integer, ForeignKey("disciplines.id"), nullable=False)
 
-    date = Column(DateTime, default=func.now())
+    date = Column(DateTime, default=func.now(), nullable=False)
 
-    present = Column(Boolean)
+    present = Column(Boolean, nullable=False)
 
     contents = Column(Text)
     homework = Column(Text)
     observations = Column(Text)
-    teacher_signature = Column(String)
-    student_signature = Column(String)
+    teacher_signature = Column(String, nullable=False)
+    student_signature = Column(String, nullable=False)
 
     absence_reason = Column(Text)
     notified_at = Column(DateTime)
@@ -203,15 +197,15 @@ class Evaluation(Base):
     __tablename__ = "evaluations"
 
     id = Column(Integer, primary_key=True)
-    student_id = Column(String, ForeignKey("students.id"))
-    teacher_id = Column(String, ForeignKey("teachers.id"))
-    discipline_id = Column(Integer, ForeignKey("disciplines.id"))
-    start_date = Column(Date)
-    end_date = Column(Date)
+    student_id = Column(String, ForeignKey("students.id"), nullable=False)
+    teacher_id = Column(String, ForeignKey("teachers.id"), nullable=False)
+    discipline_id = Column(Integer, ForeignKey("disciplines.id"), nullable=False)
+    start_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
     behavior = Column(Text)
-    score = Column(Enum(EvaluationScore))
+    score = Column(Enum(EvaluationScore), nullable=False)
     strategies = Column(Text)
-    teacher_signature = Column(String)
+    teacher_signature = Column(String, nullable=False)
     parent_comment = Column(Text)
 
     # Relationships 
