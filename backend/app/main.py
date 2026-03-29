@@ -1,7 +1,8 @@
 #File to create the app FastAPI, import routes and connect them to the app
 from fastapi import FastAPI
+from .database import Base, engine
+from .routers import auth_router
 from . import models
-from app.database import Base, engine
 
 app = FastAPI(title="Tutoring Center")
 
@@ -14,3 +15,6 @@ async def root():
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
+
+# Include routers
+app.include_router(auth_router.router)
