@@ -12,7 +12,6 @@ from .models import (
     UserRole,
 )
 
-# --- Base Schemas ---
 
 class UserBase(BaseModel):
     email: EmailStr
@@ -28,6 +27,16 @@ class UserRead(UserBase):
 
     class Config:
         orm_mode = True
+
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
 
 class ParentBase(BaseModel):
@@ -58,7 +67,7 @@ class TeacherBase(BaseModel):
 
 
 class TeacherCreate(TeacherBase):
-    user_id: Optional[str]
+    pass
 
 
 class TeacherRead(TeacherBase):
