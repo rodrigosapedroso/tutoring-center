@@ -34,6 +34,7 @@ class LoginRequest(BaseModel):
     password: str
 
 
+#for token response
 class Token(BaseModel):
     access_token: str
     token_type: str
