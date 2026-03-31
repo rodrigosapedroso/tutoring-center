@@ -4,9 +4,6 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-# Load .env variables into environment
-load_dotenv()
-
 # PostgreSQL connection 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
