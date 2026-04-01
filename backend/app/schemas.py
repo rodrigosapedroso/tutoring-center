@@ -68,12 +68,13 @@ class TeacherBase(BaseModel):
 
 
 class TeacherCreate(TeacherBase):
-    pass
+    discipline_ids: list[int]
 
 
 class TeacherRead(TeacherBase):
     id: str
     user_id: Optional[str]
+    disciplines: list[DisciplineRead]
 
     class Config:
         orm_mode = True
