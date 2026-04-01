@@ -1,14 +1,14 @@
 import uuid
 
-from fastapi import Depends
 from sqlalchemy.orm import Session
 
+from ..schemas import TeacherCreate
 from .email_service import send_email
-from ..models import User, UserRole, Teacher
+from ..models import User, UserRole, Teacher, Discipline
 from ..utils.hashing import generate_password, hash_password
 
 
-def create_teacher(teacher_data, db: Session):
+def create_teacher(teacher_data: TeacherCreate, db: Session):
     # Check if email already exists
     existing_user = db.query(User).filter(User.email == teacher_data.email).first()
     if existing_user:
@@ -25,9 +25,15 @@ def create_teacher(teacher_data, db: Session):
         role=UserRole.TEACHER
     )
     db.add(user)
-    db.commit()
-    db.refresh(user)
+    db.flush()
 
+    disciplines = db.query(Discipline).filter(
+        Discipline.id.in_(teacher_data.discipline_ids)
+    ).all()
+
+    if len(disciplines) != len(teacher_data.discipline_ids):
+        raise ValueError("One or more disciplines not found")
+    
     # Create teacher profile
     teacher = Teacher(
         id=str(uuid.uuid4()),
@@ -36,12 +42,17 @@ def create_teacher(teacher_data, db: Session):
         birth=teacher_data.birth,
         nationality=teacher_data.nationality,
         contact=teacher_data.contact,
-        email=teacher_data.email
+        email=teacher_data.email,
+        disciplines=disciplines
     )
     db.add(teacher)
     db.commit()
     db.refresh(teacher)
 
-    send_email(to_email=teacher_data.email, name=teacher_data.name, temporary_password=raw_password)
+    send_email(
+        to_email=teacher_data.email, 
+        name=teacher_data.name, 
+        temporary_password=raw_password
+    )
 
     return teacher
