@@ -9,11 +9,11 @@ from ..auth import require_admin
 
 router = APIRouter(prefix="/api/teachers")
 
-@router.post("/", response_model=TeacherRead, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=TeacherRead)
 def create_teacher_endpoint(
     teacher_data: TeacherCreate, 
     db: Session = Depends(get_db), 
-    admin: User = Depends(require_admin)
+    _: User = Depends(require_admin)
 ):
     try:
         teacher = create_teacher(teacher_data, db)
