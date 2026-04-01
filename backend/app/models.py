@@ -93,7 +93,7 @@ class Teacher(Base):
     disciplines = relationship("Discipline", secondary=teacher_disciplines, back_populates="teachers")
 
 
-# Enum for education levels
+# Enum for discipline levels
 class DisciplineLevel(enum.Enum):
     BASIC = "basic"
     SECONDARY = "secondary"
