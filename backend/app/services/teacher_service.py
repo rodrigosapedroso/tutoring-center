@@ -17,7 +17,7 @@ def create_teacher(teacher_data: TeacherCreate, db: Session):
     raw_password = generate_password()
     hashed_password = hash_password(raw_password)
     
-     # Create user account for teacher
+    # Create user account for teacher
     user = User(
         id=str(uuid.uuid4()),
         email=teacher_data.email, 
