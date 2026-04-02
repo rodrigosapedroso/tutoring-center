@@ -1,8 +1,7 @@
-from __future__ import annotations
 from datetime import date, datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 from .models import (
     ClassFrequencyType,
@@ -25,8 +24,7 @@ class UserCreate(UserBase):
 class UserRead(UserBase):
     id: str
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class LoginRequest(BaseModel):
@@ -55,8 +53,40 @@ class ParentRead(ParentBase):
     id: str
     user_id: Optional[str]
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
+
+
+class StudentBase(BaseModel):
+    name: str
+    birth: date
+    nationality: str
+    contact: Optional[str]
+
+
+class StudentCreate(StudentBase):
+    parent_ids: Optional[List[str]] = []
+
+
+class StudentRead(StudentBase):
+    id: str
+    parents: List[ParentRead]
+    classes: List[str]
+
+    model_config = ConfigDict(from_attributes=True)
+
+class DisciplineBase(BaseModel):
+    name: str
+    level: DisciplineLevel
+
+
+class DisciplineCreate(DisciplineBase):
+    pass
+
+
+class DisciplineRead(DisciplineBase):
+    id: int
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TeacherBase(BaseModel):
@@ -76,44 +106,7 @@ class TeacherRead(TeacherBase):
     user_id: Optional[str]
     disciplines: list[DisciplineRead]
 
-    class Config:
-        orm_mode = True
-
-
-class StudentBase(BaseModel):
-    name: str
-    birth: date
-    nationality: str
-    contact: Optional[str]
-
-
-class StudentCreate(StudentBase):
-    parent_ids: Optional[List[str]] = []
-
-
-class StudentRead(StudentBase):
-    id: str
-    parents: List[ParentRead]
-    classes: List[str]
-
-    class Config:
-        orm_mode = True
-
-
-class DisciplineBase(BaseModel):
-    name: str
-    level: DisciplineLevel
-
-
-class DisciplineCreate(DisciplineBase):
-    pass
-
-
-class DisciplineRead(DisciplineBase):
-    id: int
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ClassBase(BaseModel):
@@ -134,8 +127,7 @@ class ClassRead(ClassBase):
     teacher: TeacherRead
     discipline: DisciplineRead
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ClassScheduleBase(BaseModel):
@@ -155,8 +147,7 @@ class ClassScheduleCreate(ClassScheduleBase):
 class ClassScheduleRead(ClassScheduleBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class AttendanceBase(BaseModel):
@@ -190,8 +181,7 @@ class AttendanceRead(AttendanceBase):
     teacher: TeacherRead
     class_: ClassRead
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class AttendanceSummary(BaseModel):
@@ -224,5 +214,4 @@ class EvaluationRead(EvaluationBase):
     teacher: TeacherRead
     discipline: DisciplineRead
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
