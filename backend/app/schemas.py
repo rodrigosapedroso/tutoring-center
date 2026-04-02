@@ -88,7 +88,7 @@ class StudentBase(BaseModel):
 
 
 class StudentCreate(StudentBase):
-    pass
+    parent_ids: Optional[List[str]] = []
 
 
 class StudentRead(StudentBase):
