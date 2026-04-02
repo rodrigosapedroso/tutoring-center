@@ -12,6 +12,10 @@ from .models import (
 )
 
 
+class ORMBase(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+
 class UserBase(BaseModel):
     email: EmailStr
     role: UserRole
@@ -21,10 +25,8 @@ class UserCreate(UserBase):
     password: str
 
 
-class UserRead(UserBase):
+class UserRead(UserBase, ORMBase):
     id: str
-
-    model_config = ConfigDict(from_attributes=True)
 
 
 class LoginRequest(BaseModel):
@@ -49,11 +51,9 @@ class ParentCreate(ParentBase):
     user_id: Optional[str]
 
 
-class ParentRead(ParentBase):
+class ParentRead(ParentBase, ORMBase):
     id: str
     user_id: Optional[str]
-
-    model_config = ConfigDict(from_attributes=True)
 
 
 class StudentBase(BaseModel):
@@ -67,12 +67,11 @@ class StudentCreate(StudentBase):
     parent_ids: Optional[List[str]] = []
 
 
-class StudentRead(StudentBase):
+class StudentRead(StudentBase, ORMBase):
     id: str
     parents: List[ParentRead]
     classes: List[str]
 
-    model_config = ConfigDict(from_attributes=True)
 
 class DisciplineBase(BaseModel):
     name: str
@@ -83,10 +82,8 @@ class DisciplineCreate(DisciplineBase):
     pass
 
 
-class DisciplineRead(DisciplineBase):
+class DisciplineRead(DisciplineBase, ORMBase):
     id: int
-
-    model_config = ConfigDict(from_attributes=True)
 
 
 class TeacherBase(BaseModel):
@@ -101,12 +98,10 @@ class TeacherCreate(TeacherBase):
     discipline_ids: list[int]
 
 
-class TeacherRead(TeacherBase):
+class TeacherRead(TeacherBase, ORMBase):
     id: str
     user_id: Optional[str]
     disciplines: list[DisciplineRead]
-
-    model_config = ConfigDict(from_attributes=True)
 
 
 class ClassBase(BaseModel):
@@ -121,13 +116,11 @@ class ClassCreate(ClassBase):
     pass
 
 
-class ClassRead(ClassBase):
+class ClassRead(ClassBase, ORMBase):
     id: str
     students: List[StudentRead]
     teacher: TeacherRead
     discipline: DisciplineRead
-
-    model_config = ConfigDict(from_attributes=True)
 
 
 class ClassScheduleBase(BaseModel):
@@ -144,10 +137,8 @@ class ClassScheduleCreate(ClassScheduleBase):
     pass
 
 
-class ClassScheduleRead(ClassScheduleBase):
+class ClassScheduleRead(ClassScheduleBase, ORMBase):
     id: int
-
-    model_config = ConfigDict(from_attributes=True)
 
 
 class AttendanceBase(BaseModel):
@@ -174,14 +165,12 @@ class AttendanceCreate(AttendanceBase):
     pass
 
 
-class AttendanceRead(AttendanceBase):
+class AttendanceRead(AttendanceBase, ORMBase):
     id: int
     date: datetime
     student: StudentRead
     teacher: TeacherRead
     class_: ClassRead
-
-    model_config = ConfigDict(from_attributes=True)
 
 
 class AttendanceSummary(BaseModel):
@@ -208,10 +197,8 @@ class EvaluationCreate(EvaluationBase):
     pass
 
 
-class EvaluationRead(EvaluationBase):
+class EvaluationRead(EvaluationBase, ORMBase):
     id: int
     student: StudentRead
     teacher: TeacherRead
     discipline: DisciplineRead
-
-    model_config = ConfigDict(from_attributes=True)
