@@ -18,16 +18,16 @@ def create_student(student_data: StudentCreate, db: Session):
     )
 
     # Associate parents (if given)
-    if student.parent_ids:
+    if student_data.parent_ids:
         parents = db.query(Parent).filter(
-            Parent.id.in_(student.parent_ids)
+            Parent.id.in_(student_data.parent_ids)
         ).all()
 
-        if len(parents) != len(student.parent_ids):
+        if len(parents) != len(student_data.parent_ids):
             raise HTTPException(status_code=404, detail="One or more parents not found")
 
         student.parents = parents
-        
+
     db.add(student)
     db.commit()
     db.refresh(student)
