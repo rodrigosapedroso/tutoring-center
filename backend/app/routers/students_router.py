@@ -15,11 +15,8 @@ def create_student(
     db: Session = Depends(get_db),
     _: User = Depends(require_admin)
 ):
-    try:
-        student = create_student_service(student_data, db)
-        return student
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    student = create_student_service(student_data, db)
+    return student
 
 
 @router.get("/", response_model=list[StudentList])

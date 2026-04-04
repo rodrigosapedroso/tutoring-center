@@ -15,8 +15,5 @@ def create_parent_endpoint(
     db: Session = Depends(get_db),
     _: User = Depends(require_admin)
 ):
-    try:
-        parent = create_parent(parent_data, db)
-        return parent
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    parent = create_parent(parent_data, db)
+    return parent

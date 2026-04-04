@@ -15,8 +15,5 @@ def create_teacher_endpoint(
     db: Session = Depends(get_db), 
     _: User = Depends(require_admin)
 ):
-    try:
-        teacher = create_teacher(teacher_data, db)
-        return teacher
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    teacher = create_teacher(teacher_data, db)
+    return teacher
