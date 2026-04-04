@@ -1,5 +1,6 @@
 import uuid
 
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from ..schemas import ParentCreate
@@ -12,7 +13,10 @@ def create_parent(parent_data: ParentCreate, db: Session):
     # Check if email already exists
     existing_user = db.query(User).filter(User.email == parent_data.email).first()
     if existing_user:
-        raise ValueError("Email already registered")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="Email already registered"
+        )
 
     raw_password = generate_password()
     hashed_password = hash_password(raw_password)
@@ -40,10 +44,16 @@ def create_parent(parent_data: ParentCreate, db: Session):
     db.commit()
     db.refresh(parent)
 
-    send_email(
-        to_email=parent_data.email,
-        name=parent_data.name,
-        temporary_password=raw_password
-    )
+    try:
+        send_email(
+            to_email=parent_data.email,
+            name=parent_data.name,
+            temporary_password=raw_password
+        )
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to send email"
+        )
 
     return parent
