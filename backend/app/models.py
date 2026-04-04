@@ -55,6 +55,7 @@ class Student(Base):
     birth = Column(Date, nullable=False)
     nationality = Column(String, nullable=False)
     contact = Column(String)
+    is_active = Column(Boolean, default=True)  # for soft delete
 
     # Relationships 
     parents = relationship("Parent", secondary=student_parents, back_populates="students")
