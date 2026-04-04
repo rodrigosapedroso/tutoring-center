@@ -63,14 +63,25 @@ class StudentBase(BaseModel):
     contact: Optional[str]
 
 
+# For student creation
 class StudentCreate(StudentBase):
     parent_ids: Optional[List[str]] = []
 
 
+# For student detail read operations
 class StudentRead(StudentBase, ORMBase):
     id: str
     parents: List[ParentRead]
-    classes: List[str]
+    classes: List[str]  
+
+
+# For student list read operations
+class StudentList(ORMBase):
+    id: str
+    name: str
+    levels: List[DisciplineLevel]
+    disciplines: List[str]
+    teachers: Optional[List[str]]
 
 
 class DisciplineBase(BaseModel):
