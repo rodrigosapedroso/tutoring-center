@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session, join
 from sqlalchemy import distinct
 
@@ -25,7 +25,10 @@ def create_student(student_data: StudentCreate, db: Session):
         ).all()
 
         if len(parents) != len(student_data.parent_ids):
-            raise HTTPException(status_code=404, detail="One or more parents not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, 
+                detail="One or more parents not found"
+            )
 
         student.parents = parents
 
@@ -56,9 +59,9 @@ def get_students(user_id: str, user_role: UserRole, db: Session):
             student_columns.append({
                 "id": student.id,
                 "name": student.name,
-                "levels": levels,
-                "disciplines": disciplines,
-                "teachers": teachers
+                "levels": list(levels),
+                "disciplines": list(disciplines),
+                "teachers": list(teachers)
             })
         
         return student_columns
@@ -67,7 +70,10 @@ def get_students(user_id: str, user_role: UserRole, db: Session):
         # Get teacher and their students through classes
         teacher = db.query(Teacher).filter(Teacher.user_id == user_id).first()
         if not teacher:
-            raise HTTPException(status_code=404, detail="Teacher not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, 
+                detail="Teacher not found"
+            )
         
         # Get all students from teacher's classes
         students = db.query(Student).join(Student.classes).filter(
@@ -90,4 +96,7 @@ def get_students(user_id: str, user_role: UserRole, db: Session):
         return student_columns
     
     else:
-        raise HTTPException(status_code=400, detail="Invalid user role")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not allowed to view students"
+        )
