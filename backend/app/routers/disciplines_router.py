@@ -13,12 +13,11 @@ def create_discipline_endpoint(
     data: DisciplineCreate,
     db: Session = Depends(get_db),
     _: User = Depends(require_admin)
-):
-    try:
-        return create_discipline(data, db)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+):  
+    return create_discipline(data, db)
     
+
 @router.get("/", response_model=list[DisciplineRead])
 def get_disciplines(db: Session = Depends(get_db)):
-    return db.query(Discipline).all()
+    disciplines = db.query(Discipline).all()
+    return disciplines

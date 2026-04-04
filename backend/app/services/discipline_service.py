@@ -1,3 +1,5 @@
+from fastapi import HTTPException, status
+
 from sqlalchemy.orm import Session
 from ..schemas import DisciplineCreate
 from ..models import Discipline
@@ -9,7 +11,10 @@ def create_discipline(data: DisciplineCreate, db: Session):
     ).first()
 
     if existing:
-        raise ValueError("Discipline already exists with the same name and level")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Discipline already exists with the same name and level"
+        )
 
     discipline = Discipline(
         name=data.name,
