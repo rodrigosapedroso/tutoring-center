@@ -40,4 +40,4 @@ def send_email(to_email: str, name: str, temporary_password: str):
 
     except Exception as e:
         print(f"Error sending email to {to_email}: {e}")
-        raise e
+        raise 
