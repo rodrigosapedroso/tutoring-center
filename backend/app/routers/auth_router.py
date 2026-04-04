@@ -11,7 +11,10 @@ router = APIRouter(prefix="/api/auth")
 def login_user(login_data: LoginRequest, db: Session = Depends(get_db)):
     user = authenticate_user(db, login_data.email, login_data.password)
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect email or password")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="Incorrect email or password"
+        )
 
     token_data = {"user_id": user.id, "role": user.role.value}
     access_token = create_access_token(token_data)
