@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from ..services.student_service import create_student as create_student_service, get_students as get_students_service
+from ..services.student_service import create_student as create_student_service, get_students as get_students_service, get_student_by_id
 from ..database import get_db
 from ..models import User
 from ..schemas import StudentCreate, StudentList, StudentRead
@@ -27,3 +27,11 @@ def get_students(
     students = get_students_service(current_user.id, current_user.role, db)
     return students
 
+
+@router.get("/{student_id}", response_model=StudentRead)
+def get_student(
+    student_id: str, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return get_student_by_id(student_id, current_user, db)
