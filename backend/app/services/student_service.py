@@ -100,3 +100,55 @@ def get_students(user_id: str, user_role: UserRole, db: Session):
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not allowed to view students"
         )
+    
+def get_student_by_id(student_id: str, user: User, db: Session):
+    student = db.query(Student).filter(
+        Student.id == student_id, 
+        Student.is_active == True
+    ).first()
+    if not student:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Student not found"
+        )
+    
+    # Check if user has access to this student
+    if user.role == UserRole.ADMIN:
+        return student
+    elif user.role == UserRole.TEACHER:
+        teacher = db.query(Teacher).filter(Teacher.user_id == user.id).first()
+        if not teacher:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Teacher not found"
+            )
+        # Check if teacher has a class with this student
+        has_access = db.query(Class).join(Class.students).filter(
+            Class.teacher_id == teacher.id,
+            Student.id == student_id
+        ).first()
+        if not has_access:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not allowed to view this student"
+            )
+        return student
+    elif user.role == UserRole.PARENT:
+        parent = db.query(Parent).filter(Parent.user_id == user.id).first()
+        if not parent:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Parent not found"
+            )
+        # Check if parent is associated with this student
+        if student not in parent.students:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not allowed to view this student"
+            )
+        return student
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not allowed to view students"
+        )
