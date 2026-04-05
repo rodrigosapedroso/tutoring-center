@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session, join
 from sqlalchemy import distinct
 
-from ..schemas import StudentCreate
+from ..schemas import StudentCreate, StudentUpdate
 from ..models import Student, Parent, Teacher, User, UserRole, Class
 
 
@@ -102,6 +102,12 @@ def get_students(user_id: str, user_role: UserRole, db: Session):
         )
     
 def get_student_by_id(student_id: str, user: User, db: Session):
+    """
+    Get student by ID with access control:
+    - ADMIN: can view any student
+    - TEACHER: can view students in their classes
+    - PARENT: can view their own children
+    """
     student = db.query(Student).filter(
         Student.id == student_id, 
         Student.is_active == True
@@ -152,3 +158,71 @@ def get_student_by_id(student_id: str, user: User, db: Session):
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not allowed to view students"
         )
+
+
+def update_student(student_id: str, student_data: StudentUpdate, db: Session):
+    """
+    Update student data. Only called by admin.
+    """
+    student = db.query(Student).filter(
+        Student.id == student_id,
+        Student.is_active == True
+    ).first()
+    
+    if not student:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Student not found"
+        )
+    
+    # Update fields if provided
+    if student_data.name is not None:
+        student.name = student_data.name
+    if student_data.birth is not None:
+        student.birth = student_data.birth
+    if student_data.nationality is not None:
+        student.nationality = student_data.nationality
+    if student_data.contact is not None:
+        student.contact = student_data.contact
+    
+    # Update parents if provided
+    if student_data.parent_ids is not None:
+        parents = db.query(Parent).filter(
+            Parent.id.in_(student_data.parent_ids)
+        ).all()
+        
+        if len(parents) != len(student_data.parent_ids):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="One or more parents not found"
+            )
+        
+        student.parents = parents
+    
+    db.commit()
+    db.refresh(student)
+    
+    return student
+
+
+def delete_student(student_id: str, db: Session):
+    """
+    Delete student (soft delete - mark as inactive).
+    Only called by admin.
+    """
+    student = db.query(Student).filter(
+        Student.id == student_id,
+        Student.is_active == True
+    ).first()
+    
+    if not student:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Student not found"
+        )
+    
+    # Soft delete
+    student.is_active = False
+    db.commit()
+    
+    return {"detail": f"Student {student_id} deleted successfully"}
