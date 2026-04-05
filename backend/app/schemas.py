@@ -68,6 +68,15 @@ class StudentCreate(StudentBase):
     parent_ids: Optional[List[str]] = []
 
 
+# For student update
+class StudentUpdate(BaseModel):
+    name: Optional[str] = None
+    birth: Optional[date] = None
+    nationality: Optional[str] = None
+    contact: Optional[str] = None
+    parent_ids: Optional[List[str]] = None
+
+
 # For student detail read operations
 class StudentRead(StudentBase, ORMBase):
     id: str
