@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from ..services.student_service import (
     create_student as create_student_service,
     get_students as get_students_service,
-    get_student_by_id,
+    get_student_by_id as get_student_by_id_service,
     update_student as update_student_service,
     delete_student as delete_student_service,
 )
@@ -35,12 +35,12 @@ def get_students(
 
 
 @router.get("/{student_id}", response_model=StudentRead)
-def get_student(
+def get_student_by_id(
     student_id: str, 
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    return get_student_by_id(student_id, current_user, db)
+    return get_student_by_id_service(student_id, current_user, db)
 
 
 @router.patch("/{student_id}", response_model=StudentRead)
