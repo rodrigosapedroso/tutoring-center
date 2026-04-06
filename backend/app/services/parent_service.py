@@ -104,3 +104,26 @@ def update_parent(parent_id: str, parent_data: ParentUpdate, db: Session):
     db.refresh(parent)
     
     return parent
+
+
+def delete_parent(parent_id: str, db: Session):
+    """
+    Delete parent (soft delete - mark as inactive).
+    Only called by admin.
+    """
+    parent = db.query(Parent).filter(
+        Parent.id == parent_id,
+        Parent.is_active == True
+    ).first()
+    
+    if not parent:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Parent not found"
+        )
+    
+    # Soft delete
+    parent.is_active = False
+    db.commit()
+    
+    return {"detail": f"Parent {parent_id} deleted successfully"}
