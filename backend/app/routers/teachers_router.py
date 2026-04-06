@@ -61,4 +61,5 @@ def delete_teacher(
     db: Session = Depends(get_db),
     _: User = Depends(require_admin)
 ):
-    return delete_teacher_service(teacher_id, db)
+    teacher = delete_teacher_service(teacher_id, db)
+    return teacher
