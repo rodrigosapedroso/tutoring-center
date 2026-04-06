@@ -56,6 +56,22 @@ class ParentRead(ParentBase, ORMBase):
     user_id: Optional[str]
 
 
+class ParentUpdate(BaseModel):
+    name: Optional[str] = None
+    contact: Optional[str] = None
+    address: Optional[str] = None
+    email: Optional[EmailStr] = None
+
+
+# For parent list read operations
+class ParentList(ORMBase):
+    id: str
+    name: str
+    contact: str
+    email: EmailStr
+    students_count: int
+
+
 class StudentBase(BaseModel):
     name: str
     birth: date
@@ -63,12 +79,10 @@ class StudentBase(BaseModel):
     contact: Optional[str]
 
 
-# For student creation
 class StudentCreate(StudentBase):
     parent_ids: Optional[List[str]] = []
 
 
-# For student update
 class StudentUpdate(BaseModel):
     name: Optional[str] = None
     birth: Optional[date] = None
