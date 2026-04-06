@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 from ..services.parent_service import (
     create_parent,
     get_parents as get_parents_service,
-    update_parent as update_parent_service
+    update_parent as update_parent_service,
+    delete_parent as delete_parent_service
 )
 from ..database import get_db
 from ..models import User
@@ -40,4 +41,14 @@ def update_parent(
     _: User = Depends(require_admin)
 ):
     parent = update_parent_service(parent_id, parent_data, db)
+    return parent
+
+
+@router.delete("/{parent_id}")
+def delete_parent(
+    parent_id: str,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_admin)
+):
+    parent = delete_parent_service(parent_id, db)
     return parent
