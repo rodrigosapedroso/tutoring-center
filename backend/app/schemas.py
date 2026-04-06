@@ -124,6 +124,24 @@ class TeacherRead(TeacherBase, ORMBase):
     disciplines: list[DisciplineRead]
 
 
+# For teacher update
+class TeacherUpdate(BaseModel):
+    name: Optional[str] = None
+    birth: Optional[date] = None
+    nationality: Optional[str] = None
+    contact: Optional[str] = None
+    email: Optional[EmailStr] = None
+    discipline_ids: Optional[list[int]] = None
+
+
+#For teacher list read operations
+class TeacherList(ORMBase):
+    id: str
+    name: str
+    levels: List[DisciplineLevel]
+    disciplines: List[str]
+
+
 class ClassBase(BaseModel):
     teacher_id: str
     discipline_id: int
