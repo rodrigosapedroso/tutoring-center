@@ -159,7 +159,7 @@ def get_student_by_id(student_id: str, user: User, db: Session):
         )
 
 
-def get_student_by_teacher(teacher_id: str, db: Session):  
+def get_students_by_teacher(teacher_id: str, db: Session):  
     """
     Only called by admin to view their students for a specific teacher.
     """
@@ -174,18 +174,44 @@ def get_student_by_teacher(teacher_id: str, db: Session):
             detail="Teacher not found"
         )
     
-    student = db.query(Student).join(Student.classes).filter(
+    students = db.query(Student).join(Student.classes).filter(
         Class.teacher_id == teacher_id,
         Student.is_active == True
     ).distinct().all()
     
-    if not student:
+    if not students:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Student not found or not associated with this teacher"
         )
     
-    return student
+    return students
+
+
+def get_students_by_parent(parent_id: str, db: Session):  
+    """
+    Only called by admin to view their students for a specific parent.
+    """
+    parent = db.query(Parent).filter(
+        Parent.id == parent_id, 
+        Parent.is_active == True
+    ).first()
+
+    if not parent:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Parent not found"
+        )
+    
+    students = [s for s in parent.students if s.is_active]
+    
+    if not students:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Student not found or not associated with this parent"
+        )
+    
+    return students
 
 
 def update_student(student_id: str, student_data: StudentUpdate, db: Session):
