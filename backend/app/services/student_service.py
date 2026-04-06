@@ -63,7 +63,6 @@ def get_students(user_id: str, user_role: UserRole, db: Session):
                 "disciplines": list(disciplines),
                 "teachers": list(teachers)
             })
-        
         return student_columns
     
     elif user_role == UserRole.TEACHER:
@@ -158,6 +157,35 @@ def get_student_by_id(student_id: str, user: User, db: Session):
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not allowed to view students"
         )
+
+
+def get_student_by_teacher(teacher_id: str, db: Session):  
+    """
+    Only called by admin to view their students for a specific teacher.
+    """
+    teacher = db.query(Teacher).filter(
+        Teacher.id == teacher_id, 
+        Teacher.is_active == True
+    ).first()
+
+    if not teacher:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Teacher not found"
+        )
+    
+    student = db.query(Student).join(Student.classes).filter(
+        Class.teacher_id == teacher_id,
+        Student.is_active == True
+    ).distinct().all()
+    
+    if not student:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Student not found or not associated with this teacher"
+        )
+    
+    return student
 
 
 def update_student(student_id: str, student_data: StudentUpdate, db: Session):
