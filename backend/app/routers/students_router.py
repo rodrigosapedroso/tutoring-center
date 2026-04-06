@@ -7,6 +7,7 @@ from ..services.student_service import (
     get_student_by_id as get_student_by_id_service,
     update_student as update_student_service,
     delete_student as delete_student_service,
+    get_student_by_teacher as get_student_by_teacher_service
 )
 from ..database import get_db
 from ..models import User
@@ -41,6 +42,16 @@ def get_student_by_id(
     current_user: User = Depends(get_current_user)
 ):
     return get_student_by_id_service(student_id, current_user, db)
+
+
+@router.get("/{teacher_id}/students", response_model=list[StudentRead])
+def get_student_by_teacher(
+    teacher_id: str,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_admin)
+):
+    students = get_student_by_teacher_service(teacher_id, db)
+    return students
 
 
 @router.patch("/{student_id}", response_model=StudentRead)
