@@ -87,6 +87,7 @@ class Teacher(Base):
     nationality = Column(String, nullable=False)
     contact = Column(String, nullable=False)
     email = Column(String, nullable=False)
+    is_active = Column(Boolean, default=True)  # for soft delete
 
     # Relationships 
     user = relationship("User", back_populates="teacher")
