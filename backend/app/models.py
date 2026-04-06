@@ -71,6 +71,7 @@ class Parent(Base):
     contact = Column(String, nullable=False)
     address = Column(String, nullable=False)
     email = Column(String, nullable=False)
+    is_active = Column(Boolean, default=True)  # for soft delete
 
     # Relationships 
     user = relationship("User", back_populates="parent")
