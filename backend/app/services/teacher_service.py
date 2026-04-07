@@ -123,19 +123,19 @@ def update_teacher(teacher_id: str, teacher_data: TeacherUpdate, db: Session):
         )
     
     # Update fields if provided
-    if teacher_data.name is not None:
+    if teacher_data.name:
         teacher.name = teacher_data.name
-    if teacher_data.birth is not None:
+    if teacher_data.birth:
         teacher.birth = teacher_data.birth
-    if teacher_data.nationality is not None:
+    if teacher_data.nationality:
         teacher.nationality = teacher_data.nationality
-    if teacher_data.contact is not None:
+    if teacher_data.contact:
         teacher.contact = teacher_data.contact
-    if teacher_data.email is not None:
+    if teacher_data.email:
         teacher.email = teacher_data.email
     
     # Update disciplines if provided
-    if teacher_data.discipline_ids is not None:
+    if teacher_data.discipline_ids:
         disciplines = db.query(Discipline).filter(
             Discipline.id.in_(teacher_data.discipline_ids)
         ).all()

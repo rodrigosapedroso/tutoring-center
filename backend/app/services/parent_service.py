@@ -91,13 +91,13 @@ def update_parent(parent_id: str, parent_data: ParentUpdate, db: Session):
         )
     
     # Update fields if provided
-    if parent_data.name is not None:
+    if parent_data.name:
         parent.name = parent_data.name
-    if parent_data.contact is not None:
+    if parent_data.contact:
         parent.contact = parent_data.contact
-    if parent_data.address is not None:
+    if parent_data.address:
         parent.address = parent_data.address
-    if parent_data.email is not None:
+    if parent_data.email:
         parent.email = parent_data.email
     
     db.commit()

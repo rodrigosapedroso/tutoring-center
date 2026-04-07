@@ -230,13 +230,13 @@ def update_student(student_id: str, student_data: StudentUpdate, db: Session):
         )
     
     # Update fields if provided
-    if student_data.name is not None:
+    if student_data.name:
         student.name = student_data.name
-    if student_data.birth is not None:
+    if student_data.birth:
         student.birth = student_data.birth
-    if student_data.nationality is not None:
+    if student_data.nationality:
         student.nationality = student_data.nationality
-    if student_data.contact is not None:
+    if student_data.contact:
         student.contact = student_data.contact
     
     # Update parents if provided
