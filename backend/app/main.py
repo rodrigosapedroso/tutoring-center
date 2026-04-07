@@ -6,7 +6,14 @@ load_dotenv()
 
 from fastapi import FastAPI
 from .database import Base, engine
-from .routers import auth_router, disciplines_router, teachers_router, students_router, parents_router
+from .routers import (
+    auth_router, 
+    disciplines_router, 
+    teachers_router, 
+    students_router, 
+    parents_router, 
+    class_router
+)
 from . import models
 
 app = FastAPI(title="Tutoring Center")
@@ -27,3 +34,4 @@ app.include_router(disciplines_router.router)
 app.include_router(teachers_router.router)
 app.include_router(students_router.router)
 app.include_router(parents_router.router)
+app.include_router(class_router.router)
