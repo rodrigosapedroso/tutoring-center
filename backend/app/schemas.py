@@ -194,6 +194,15 @@ class ClassRead(ClassBase, ORMBase):
     discipline: DisciplineRead
 
 
+class ClassUpdate(BaseModel):
+    teacher_id: Optional[str] = None
+    discipline_id: Optional[int] = None
+    student_ids: Optional[List[str]] = None
+    level: Optional[DisciplineLevel] = None
+    type: Optional[ClassType] = None
+    schedules: Optional[List[ClassScheduleCreate]] = None
+
+
 class AttendanceBase(BaseModel):
     class_id: str
     student_id: str
