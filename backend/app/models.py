@@ -1,6 +1,6 @@
 import enum
 from .database import Base
-from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, Enum, Text, Boolean, Table
+from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, Enum, Text, Boolean, Table, Time
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -148,8 +148,8 @@ class ClassSchedule(Base):
 
     id = Column(Integer, primary_key=True)
     class_id = Column(String, ForeignKey("classes.id"), nullable=False)
-    weekday = Column(Integer, nullable=False)  # 0-5
-    time = Column(String, nullable=False) 
+    weekday = Column(Integer, nullable=False)  # 0-6 for Monday-Sunday
+    time = Column(Time, nullable=False) 
     duration = Column(Integer, nullable=False) 
     frequency = Column(Enum(ClassFrequencyType), nullable=False)
     start_date = Column(Date, nullable=False)
