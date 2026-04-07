@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from typing import List, Optional
 
+from datetime import time
 from pydantic import BaseModel, ConfigDict, EmailStr
 
 from .models import (
@@ -156,29 +157,9 @@ class TeacherList(ORMBase):
     disciplines: List[str]
 
 
-class ClassBase(BaseModel):
-    teacher_id: str
-    discipline_id: int
-    student_ids: List[str]
-    level: DisciplineLevel
-    type: ClassType
-
-
-class ClassCreate(ClassBase):
-    pass
-
-
-class ClassRead(ClassBase, ORMBase):
-    id: str
-    students: List[StudentRead]
-    teacher: TeacherRead
-    discipline: DisciplineRead
-
-
 class ClassScheduleBase(BaseModel):
-    class_id: str
     weekday: int
-    time: str
+    time: time
     duration: int
     frequency: ClassFrequencyType
     start_date: date
@@ -191,6 +172,26 @@ class ClassScheduleCreate(ClassScheduleBase):
 
 class ClassScheduleRead(ClassScheduleBase, ORMBase):
     id: int
+    class_id: str
+
+
+class ClassBase(BaseModel):
+    teacher_id: str
+    discipline_id: int
+    student_ids: List[str]
+    level: DisciplineLevel
+    type: ClassType
+
+
+class ClassCreate(ClassBase):
+    schedules: List[ClassScheduleCreate]
+
+
+class ClassRead(ClassBase, ORMBase):
+    id: str
+    students: List[StudentRead]
+    teacher: TeacherRead
+    discipline: DisciplineRead
 
 
 class AttendanceBase(BaseModel):
