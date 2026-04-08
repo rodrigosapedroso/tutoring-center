@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 from ..services.class_service import (
     create_class as create_class_service, 
     get_classes as get_classes_service,
-    update_class as update_class_service
+    update_class as update_class_service,
+    delete_class as delete_class_service
 )
 from ..database import get_db
 from ..models import User
@@ -40,3 +41,13 @@ def update_class(
     _: User = Depends(require_admin)
 ):
     return update_class_service(class_id, data, db)
+
+
+@router.delete("/{class_id}")
+def delete_class(
+    class_id: str,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_admin)
+):
+    class_ = delete_class_service(class_id, db)
+    return class_
