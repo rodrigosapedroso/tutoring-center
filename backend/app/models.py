@@ -128,6 +128,7 @@ class Class(Base):
     discipline_id = Column(Integer, ForeignKey("disciplines.id"), nullable=False)
     level = Column(Enum(DisciplineLevel), nullable=False)
     type = Column(Enum(ClassType), nullable=False)
+    is_active = Column(Boolean, default=True)  # for soft delete
 
     # Relationships 
     teacher = relationship("Teacher", back_populates="classes")
