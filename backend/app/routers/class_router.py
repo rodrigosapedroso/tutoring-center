@@ -3,11 +3,12 @@ from sqlalchemy.orm import Session
 
 from ..services.class_service import (
     create_class as create_class_service, 
-    get_classes as get_classes_service
+    get_classes as get_classes_service,
+    update_class as update_class_service
 )
 from ..database import get_db
 from ..models import User
-from ..schemas import ClassCreate, ClassRead
+from ..schemas import ClassCreate, ClassRead, ClassUpdate
 from ..auth import get_current_user, require_admin
 
 router = APIRouter(prefix="/api/classes")
@@ -29,3 +30,13 @@ def get_classes(
     current_user: User = Depends(get_current_user)
 ):
     return get_classes_service(current_user, db)
+
+
+@router.patch("/{class_id}", response_model=ClassRead)
+def update_class(
+    class_id: str,
+    data: ClassUpdate,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_admin)
+):
+    return update_class_service(class_id, data, db)
