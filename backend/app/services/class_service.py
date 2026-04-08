@@ -279,3 +279,22 @@ def update_class(class_id: str, data: ClassUpdate, db: Session):
     db.refresh(class_)
 
     return class_
+
+
+def delete_class(class_id: str, db: Session):
+
+    class_ = db.query(Class).filter(
+        Class.id == class_id,
+        Class.is_active == True
+    ).first()
+
+    if not class_:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Class not found"
+        )
+
+    class_.is_active = False
+    
+    db.commit()
+    return {"detail": "Class deleted"}
