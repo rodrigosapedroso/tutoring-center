@@ -3,7 +3,7 @@ import uuid
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from ..schemas import ClassCreate
+from ..schemas import ClassCreate, ClassUpdate
 from ..models import Class, ClassType, Discipline, Parent, Parent, Student, Teacher, ClassSchedule, User, UserRole
 
 
@@ -162,3 +162,120 @@ def get_classes(user: User, db: Session):
         )
 
     return classes
+
+
+def update_class(class_id: str, data: ClassUpdate, db: Session):
+
+    class_ = db.query(Class).filter(
+        Class.id == class_id,
+        Class.is_active == True
+    ).first()
+
+    if not class_:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Class not found"
+        )
+
+    if data.teacher_id:
+        teacher = db.query(Teacher).filter(
+            Teacher.id == data.teacher_id,
+            Teacher.is_active == True
+        ).first()
+
+        if not teacher:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Teacher not found"
+            )
+
+        class_.teacher_id = teacher.id
+
+    if data.discipline_id:
+        discipline = db.query(Discipline).filter(
+            Discipline.id == data.discipline_id
+        ).first()
+
+        if not discipline:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Discipline not found"
+            )
+
+        class_.discipline_id = discipline.id
+        class_.level = data.level or discipline.level
+
+    elif data.level:
+        discipline = db.query(Discipline).filter(
+            Discipline.id == class_.discipline_id
+        ).first()
+
+        if discipline.level != data.level:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Level does not match discipline"
+            )
+
+        class_.level = data.level
+
+    if data.type:
+        class_.type = data.type
+
+    if data.student_ids:
+        students = db.query(Student).filter(
+            Student.id.in_(data.student_ids),
+            Student.is_active == True
+        ).all()
+
+        if len(students) != len(data.student_ids):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="One or more students not found"
+            )
+
+        if class_.type == ClassType.INDIVIDUAL and len(students) != 1:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Individual class must have 1 student"
+            )
+
+        class_.students = students
+
+    if data.schedules:
+        db.query(ClassSchedule).filter(
+            ClassSchedule.class_id == class_id
+        ).delete()
+
+        new_schedules = [
+            ClassSchedule(
+                class_id=class_id,
+                weekday=s.weekday,
+                time=str(s.time),
+                duration=s.duration,
+                frequency=s.frequency,
+                start_date=s.start_date,
+                end_date=s.end_date
+            )
+            for s in data.schedules
+        ]
+
+        db.add_all(new_schedules)
+
+    teacher = db.query(Teacher).filter(
+        Teacher.id == class_.teacher_id
+    ).first()
+
+    discipline = db.query(Discipline).filter(
+        Discipline.id == class_.discipline_id
+    ).first()
+
+    if discipline not in teacher.disciplines:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Teacher does not teach this discipline"
+        )
+
+    db.commit()
+    db.refresh(class_)
+
+    return class_
