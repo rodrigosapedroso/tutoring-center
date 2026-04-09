@@ -1,10 +1,11 @@
+import datetime
 import uuid
 
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from ..schemas import ClassCreate, ClassUpdate
-from ..models import Class, ClassType, Discipline, Parent, Parent, Student, Teacher, ClassSchedule, User, UserRole
+from ..models import Class, ClassType, Discipline, Parent, Student, Teacher, ClassSchedule, User, UserRole
 
 
 def create_class(class_data: ClassCreate, db: Session):
@@ -164,6 +165,29 @@ def get_classes(user: User, db: Session):
     return classes
 
 
+def get_classes_today(user: User, db: Session):
+    today_weekday = datetime.now().weekday()
+
+    classes = get_classes(user, db)
+
+    result = []
+    for c in classes:
+        for s in c.schedules:
+            if s.weekday == today_weekday:
+                result.append({
+                    "class_id": c.id,
+                    "time": s.time,
+                    "discipline": c.discipline.name,
+                    "teacher": c.teacher.name,
+                    "students_count": len(c.students)
+                })
+
+    #order by time
+    result.sort(key=lambda x: x["time"])
+
+    return result
+
+
 def update_class(class_id: str, data: ClassUpdate, db: Session):
 
     class_ = db.query(Class).filter(
@@ -295,6 +319,6 @@ def delete_class(class_id: str, db: Session):
         )
 
     class_.is_active = False
-    
+
     db.commit()
     return {"detail": "Class deleted"}
