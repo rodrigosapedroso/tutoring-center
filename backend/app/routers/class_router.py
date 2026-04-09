@@ -4,12 +4,13 @@ from sqlalchemy.orm import Session
 from ..services.class_service import (
     create_class as create_class_service, 
     get_classes as get_classes_service,
+    get_classes_today as get_classes_today_service,
     update_class as update_class_service,
     delete_class as delete_class_service
 )
 from ..database import get_db
 from ..models import User
-from ..schemas import ClassCreate, ClassRead, ClassUpdate
+from ..schemas import ClassCreate, ClassRead, ClassUpdate, ClassToday
 from ..auth import get_current_user, require_admin
 
 router = APIRouter(prefix="/api/classes")
@@ -31,6 +32,14 @@ def get_classes(
     current_user: User = Depends(get_current_user)
 ):
     return get_classes_service(current_user, db)
+
+
+@router.get("/today", response_model=list[ClassToday])
+def get_classes_today(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return get_classes_today_service(current_user, db)
 
 
 @router.patch("/{class_id}", response_model=ClassRead)
