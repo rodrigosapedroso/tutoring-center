@@ -203,6 +203,14 @@ class ClassUpdate(BaseModel):
     schedules: Optional[List[ClassScheduleCreate]] = None
 
 
+class ClassToday(BaseModel):
+    class_id: str
+    time: str
+    discipline: str
+    teacher: str
+    students_count: int
+
+
 class AttendanceBase(BaseModel):
     class_id: str
     student_id: str
